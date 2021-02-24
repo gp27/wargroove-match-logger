@@ -4,7 +4,19 @@ local utils = require "utils"
 local State = {}
 
 function State.getMap()
-  local abbrv = {forest="F", mountain="M", sea="s", river="R", plains="p", road="r", bridge="b", beach="e", reef="F"}
+  local abbrv = {
+    forest=   "F",
+    river=    "I",
+    mountain= "M",
+    reefs=    "R",
+    bridge=   "b",
+    deepsea=  "d",
+    beach=    "e",
+    flagstone="f",
+    plains=   "p",
+    road=     "r",
+    sea=      "s"
+  }
 
   local map = {}
   map.size = Wargroove.getMapSize()
