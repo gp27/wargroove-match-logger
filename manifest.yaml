@@ -1,6 +1,6 @@
 ---
 
-id: wagroove_logger_mod
+id: wagroove-match-logger
 name: "Wargroove Match Logger"              
 author: "gp27"
 description: "A mod that save matches info in the cloud" 

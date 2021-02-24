@@ -1,4 +1,6 @@
 local utils = {}
+local json = require "json"
+local io = require "io"
 
 function utils:copyTable(orig)
     local copy
@@ -13,29 +15,28 @@ function utils:copyTable(orig)
     return copy
 end
 
---[[function utils:printTable (tbl, indent)
-    if not indent then indent = 0 end
-    local toprint = string.rep(" ", indent) .. "{\r\n"
-    indent = indent + 2 
-  for k, v in pairs(tbl) do
-        toprint = toprint .. string.rep(" ", indent)
-        if (type(k) == "number") then
-            toprint = toprint .. "[" .. k .. "] = "
-        elseif (type(k) == "string") then
-            toprint = toprint  .. k ..  "= "
-        end
-        if (type(v) == "number") then
-            toprint = toprint .. v .. ",\r\n"
-        elseif (type(v) == "string") then
-            toprint = toprint .. "\"" .. v .. "\",\r\n"
-        elseif (type(v) == "table") then
-            toprint = toprint .. utils:printTable(v, indent + 2) .. ",\r\n"
-        else
-            toprint = toprint .. "\"" .. tostring(v) .. "\",\r\n"
-        end
+function utils:curl(method, url, headers, data)
+    local cmd = 'curl --location -X ' .. (method or "GET") .. ' "' .. url .. '" '
+    for key, value in ipairs(headers) do
+        cmd = cmd .. '-H  "' .. key .. ': ' .. value .. '" '
     end
-    toprint = toprint .. string.rep(" ", indent-2) .. "}"
-    return toprint
-end]]
+    if(data) then
+        cmd = cmd .. tostring(data)
+    end
+    local curlProc = io.popen(cmd, "r")
+    local response = curlProc:read("a*")
+    curlProc:close()
+    return response
+end
+
+function utils:postJSON(url, table)
+    --[[local body = json.stringify(table)
+    local resp = utils:curl("POST", url, { ["Content-Type"] = "application/json" }, body)
+    if resp ~= "" then
+        return resp
+    end]]
+    
+    return nil
+end
 
 return utils

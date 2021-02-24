@@ -131,7 +131,7 @@ function json.stringify(obj, as_key)
     return tostring(obj)
   elseif kind == 'boolean' then
     return tostring(obj)
-  elseif kind == 'nil' then
+  elseif kind == 'nil' or kind == 'function' then
     return 'null'
   else
     error('Unjsonifiable type: ' .. kind .. '.')

@@ -4,20 +4,23 @@ local utils = require "utils"
 local State = {}
 
 function State.getMap()
+  local abbrv = {forest="F", mountain="M", sea="s", river="R", plains="p", road="r", bridge="b", beach="e", reef="F"}
+
   local map = {}
   map.size = Wargroove.getMapSize()
-  map.tiles = {}
+  map.tiles = ""
 
-  for x=0, map.size.x do
-    for y=0, map.size.y do
-      table.insert(map.tiles, Wargroove.getTerrainNameAt({x=x, y=y}))
+  for x=0, map.size.x - 1 do
+    for y=0, map.size.y - 1 do
+      local name = Wargroove.getTerrainNameAt({x=x, y=y})
+      map.tiles = map.tiles .. (abbrv[name] or ('.'..name..'.'))
     end
   end
   
   return map
 end
 
-function State.generate()
+function State.getState()
   local newState = {}
 
   newState.gold = {}
@@ -36,6 +39,22 @@ function State.generate()
   newState.turnNumber = Wargroove.getTurnNumber()
 
   return newState
+end
+
+function State.getPlayers()
+  local victory = {}
+
+  for id=0, Wargroove.getNumPlayers(false) - 1 do
+    table.insert(victory, {
+      id=id,
+      team=Wargroove.getPlayerTeam(id),
+      is_victorious=Wargroove.isPlayerVictorious(id),
+      is_local=Wargroove.isLocalPlayer(id),
+      is_human=Wargroove.isHuman(id)
+    })
+  end
+
+  return victory
 end
 
 return State
