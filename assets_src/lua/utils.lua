@@ -20,9 +20,13 @@ function utils:curl(method, url, headers, data)
     for key, value in ipairs(headers) do
         cmd = cmd .. '-H  "' .. key .. ': ' .. value .. '" '
     end
+
     if(data) then
-        cmd = cmd .. tostring(data)
+        cmd = cmd .. '-d "' .. tostring(data):gsub('\\', '\\\\'):gsub('"', '\\"') .. '" '
     end
+
+    print(cmd)
+
     local curlProc = io.popen(cmd, "r")
     local response = curlProc:read("a*")
     curlProc:close()
@@ -30,13 +34,20 @@ function utils:curl(method, url, headers, data)
 end
 
 function utils:postJSON(url, table)
-    --[[local body = json.stringify(table)
+    local body = json.stringify(table)
     local resp = utils:curl("POST", url, { ["Content-Type"] = "application/json" }, body)
     if resp ~= "" then
         return resp
-    end]]
+    end
     
     return nil
+end
+
+function utils:openUrlInBrowser(url)
+    local cmd = 'start ' .. url 
+    local proc = io.popen(cmd, "r")
+    proc:read("a*")
+    proc:close()
 end
 
 return utils

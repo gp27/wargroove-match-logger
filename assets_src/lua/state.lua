@@ -8,9 +8,9 @@ function State.getMap()
     forest=   "F",
     river=    "I",
     mountain= "M",
-    reefs=    "R",
+    reef=     "R",
     bridge=   "b",
-    deepsea=  "d",
+    ocean=    "o",
     beach=    "e",
     flagstone="f",
     plains=   "p",
@@ -22,8 +22,8 @@ function State.getMap()
   map.size = Wargroove.getMapSize()
   map.tiles = ""
 
-  for x=0, map.size.x - 1 do
-    for y=0, map.size.y - 1 do
+  for y=0, map.size.y - 1 do
+    for x=0, map.size.x - 1 do
       local name = Wargroove.getTerrainNameAt({x=x, y=y})
       map.tiles = map.tiles .. (abbrv[name] or ('.'..name..'.'))
     end

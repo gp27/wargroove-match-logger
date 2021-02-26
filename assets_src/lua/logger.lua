@@ -8,22 +8,27 @@ local Logger = {}
 local matchIdUnitPos = { x=-85, y=-64 }
 local matchIdUnitKey = "MLOG_MatchId"
 
-local ORIGIN = "https://worker.wgroove.tk"
+local URL = "https://wargroove-match-worker.gp27.workers.dev/match_log"
+local MATCH_WEBSITE = "https://wgroove.tk/?match_id="
 
-function Logger.getEndpoint(path)
-    return ORIGIN .. path
-end
-
-function Logger.shouldSendInfo()
-  local shouldSend = false
-
+function Logger.isLocalPlayerTurn()
   for id = 0, Wargroove.getNumPlayers(false) - 1 do
     if Wargroove.isLocalPlayer(id) and Wargroove.getCurrentPlayerId() == id then
-      shouldSend = true
+      return true
     end
   end
 
-  return shouldSend
+  return false
+end
+
+function Logger.openMatchInBrowser()
+  local matchId = Logger.getMatchId()
+  utils:openUrlInBrowser(MATCH_WEBSITE .. matchId)
+end
+
+function Logger.init()
+  Logger.setMatchId()
+  Logger.sendInit()
 end
 
 function Logger.setMatchId()
@@ -44,31 +49,32 @@ function Logger.getMatchId()
   return matchId
 end
 
-function Logger.sendMap()
+function Logger.sendInit()
   local matchId = Logger.getMatchId()
   local map = State.getMap()
-  print('map: ' .. json.stringify(map))
-  if Logger.shouldSendInfo() then
-    utils:postJSON(Logger.getEndpoint('/mlog/' .. matchId .. '/map'), map)
+  local players = State.getPlayers()
+  --print('map: ' .. json.stringify(map))
+  if Logger.isLocalPlayerTurn() then
+    utils:postJSON(URL, { match_id=matchId, map=map, players=players  })
   end
 end
 
-function Logger.sendState(stateId)
+function Logger.sendState(stateId, isStartOfTurn)
   local matchId = Logger.getMatchId()
   local state = State.getState()
   state.id = tonumber(stateId)
-  print('state: ' .. json.stringify(state))
-  if Logger.shouldSendInfo() then
-    utils:postJSON(Logger.getEndpoint('/mlog/' .. matchId .. '/state'), state)
+  --print('state: ' .. json.stringify(state))
+  if Logger.isLocalPlayerTurn() ~= isStartOfTurn then
+    utils:postJSON(URL, { match_id=matchId, state=state })
   end
 end
 
 function Logger.sendPlayers()
   local matchId = Logger.getMatchId()
   local players = State.getPlayers()
-  print('players: ' .. json.stringify(players))
-  if Logger.shouldSendInfo() then
-    utils:postJSON(Logger.getEndpoint('/mlog/' .. matchId .. '/players'), players)
+  --print('players: ' .. json.stringify(players))
+  if Logger.isLocalPlayerTurn() then
+    utils:postJSON(URL, { match_id=matchId, players=players })
   end
 end
 

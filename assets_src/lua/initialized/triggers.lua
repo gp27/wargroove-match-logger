@@ -67,39 +67,21 @@ function Triggers.getMatchLoggerInitTrigger(referenceTrigger)
     table.insert(trigger.conditions, { id = "player_turn", parameters = { "current" } })
     table.insert(trigger.conditions, { id = "start_of_turn", parameters = {} })
 
-    table.insert(trigger.actions, { id = "mlog_set_match_id", parameters = {} })
-    table.insert(trigger.actions, { id = "mlog_send_map", parameters = {} })
-    table.insert(trigger.actions, { id = "mlog_send_players", parameters = {} })
-    
-    return trigger
-end
-
-function Triggers.getTurnEndTrigger(referenceTrigger)
-    local trigger = {}
-    trigger.id =  "MatchLog Turn End"
-    trigger.recurring = "repeat"
-    trigger.players = referenceTrigger.players
-    trigger.conditions = {}
-    trigger.actions = {}
-    
-    table.insert(trigger.conditions, { id = "player_turn", parameters = { "current" } })
-    table.insert(trigger.conditions, { id = "end_of_turn", parameters = {} })
-
-    table.insert(trigger.actions, { id = "mlog_send_state", parameters = { 0 } })
+    table.insert(trigger.actions, { id = "mlog_send_init", parameters = {} })
     
     return trigger
 end
 
 function Triggers.getStateTrigger(referenceTrigger)
     local trigger = {}
-    trigger.id =  "MatchLog Unit Turn"
+    trigger.id =  "MatchLog State Change"
     trigger.recurring = "repeat"
     trigger.players = referenceTrigger.players
     trigger.conditions = {}
     trigger.actions = {}
     
     table.insert(trigger.conditions, { id = "player_turn", parameters = { "current" } })
-    table.insert(trigger.conditions, { id = "end_of_unit_turn", parameters = {} })
+    table.insert(trigger.conditions, { id = "state_change", parameters = {} })
 
     table.insert(trigger.actions, { id = "mlog_send_state", parameters = { 0 } })
     
