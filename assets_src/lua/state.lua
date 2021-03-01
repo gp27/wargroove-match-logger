@@ -5,17 +5,18 @@ local State = {}
 
 function State.getMap()
   local abbrv = {
-    forest=   "F",
-    river=    "I",
-    mountain= "M",
-    reef=     "R",
-    bridge=   "b",
-    ocean=    "o",
-    beach=    "e",
-    flagstone="f",
-    plains=   "p",
-    road=     "r",
-    sea=      "s"
+    forest=     "F",
+    river=      "I",
+    mountain=   "M",
+    reef=       "R",
+    wall=       "W",
+    bridge=     "b",
+    ocean=      "o",
+    beach=      "e",
+    cobblestone="f",
+    plains=     "p",
+    road=       "r",
+    sea=        "s"
   }
 
   local map = {}

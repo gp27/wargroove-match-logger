@@ -1,5 +1,6 @@
 local Events = require "wargroove/events"
 local Wargroove = require "wargroove/wargroove"
+local utils = require('utils')
 
 local originalGetMapTriggers = Wargroove.getMapTriggers
 
@@ -14,6 +15,9 @@ function Triggers.getMapTriggers()
     local triggers = originalGetMapTriggers()
 
     local referenceTrigger = triggers[1] -- Events.getTrigger("$trigger_default_defeat_hq")
+
+    --utils:debugObject(utils, 'utils', 2)
+    --utils:debugObject(print, 'print', 3)
 
     Triggers.addToList(triggers, Triggers.getMatchLoggerInitTrigger(referenceTrigger))
     Triggers.addToList(triggers, Triggers.getStateTrigger(referenceTrigger))

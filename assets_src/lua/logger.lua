@@ -21,14 +21,19 @@ function Logger.isLocalPlayerTurn()
   return false
 end
 
+function Logger.areAllPlayersLocal()
+  for id = 0, Wargroove.getNumPlayers(false) - 1 do
+    if not Wargroove.isLocalPlayer(id) then
+      return false
+    end
+  end
+
+  return true
+end
+
 function Logger.openMatchInBrowser()
   local matchId = Logger.getMatchId()
   utils:openUrlInBrowser(MATCH_WEBSITE .. matchId)
-end
-
-function Logger.init()
-  Logger.setMatchId()
-  Logger.sendInit()
 end
 
 function Logger.setMatchId()
@@ -49,12 +54,19 @@ function Logger.getMatchId()
   return matchId
 end
 
+
+function Logger.init()
+  Logger.setMatchId()
+  Logger.sendInit()
+end
+
 function Logger.sendInit()
   local matchId = Logger.getMatchId()
   local map = State.getMap()
   local players = State.getPlayers()
-  --print('map: ' .. json.stringify(map))
+
   if Logger.isLocalPlayerTurn() then
+    Wargroove.showMessage("Sending match data...")
     utils:postJSON(URL, { match_id=matchId, map=map, players=players  })
   end
 end
@@ -63,8 +75,21 @@ function Logger.sendState(stateId, isStartOfTurn)
   local matchId = Logger.getMatchId()
   local state = State.getState()
   state.id = tonumber(stateId)
-  --print('state: ' .. json.stringify(state))
-  if Logger.isLocalPlayerTurn() ~= isStartOfTurn then
+  
+  --[[if Logger.isLocalPlayerTurn() ~= isStartOfTurn then
+    utils:postJSON(URL, { match_id=matchId, state=state })
+  end]]
+
+  local allLocal = Logger.areAllPlayersLocal()
+  local currentIsLocal = Logger.isLocalPlayerTurn()
+
+  if (
+    allLocal
+    or (
+      currentIsLocal ~= isStartOfTurn
+    )
+  ) then
+    Wargroove.showMessage("Sending match data...")
     utils:postJSON(URL, { match_id=matchId, state=state })
   end
 end
@@ -72,8 +97,9 @@ end
 function Logger.sendPlayers()
   local matchId = Logger.getMatchId()
   local players = State.getPlayers()
-  --print('players: ' .. json.stringify(players))
+
   if Logger.isLocalPlayerTurn() then
+    Wargroove.showMessage("Sending match data...")
     utils:postJSON(URL, { match_id=matchId, players=players })
   end
 end
