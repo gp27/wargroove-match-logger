@@ -10,24 +10,36 @@ function Actions.init()
 end
 
 function Actions.populate(dst)
-    dst["mlog_send_init"] = Actions.sendInit
-    dst["mlog_send_state"] = Actions.sendState
-    dst["mlog_send_players"] = Actions.sendPlayers
+    dst["mlog_init_match"] = Actions.initMatch
+    dst["mlog_update_state"] = Actions.updateState
+    dst["mlog_send_victory"] = Actions.sendVictory
+    dst["mlog_start_session"] = Actions.startSession
 end
 
-function Actions.sendInit(context)
-    Logger.init()
+function Actions.startSession(context)
+  Logger.startSession()
+end
+
+function Actions.initMatch(context)
+  Logger.initMatch()
 end
 
 
-function Actions.sendState(context)
-  local stateID = context:getMapCounter(0)
-  context:setMapCounter(0, stateID + 1)
-  Logger.sendState(stateID, context:checkState("startOfTurn"))
+function Actions.updateState(context)
+  local updated = Logger.updateState()
+  Logger.saveMatchData()
+
+  if updated and Logger.shouldSendMatchData(context:checkState("startOfTurn")) then
+    --local stateID = context:getMapCounter(0)
+    --context:setMapCounter(0, stateID + 1)
+    Logger.sendMatchData()
+  end
 end
 
-function Actions.sendPlayers(context)
-    Logger.sendPlayers()
+function Actions.sendVictory(context)
+  Logger.updateMatchData()
+  Logger.saveMatchData()
+  Logger.sendMatchData()
 end
 
 return Actions

@@ -1,0 +1,10 @@
+---
+verbs:
+  - id: set_username
+    icon: ui/icons/unit_action_icon_set_username.png
+    name: ui_unit_verbs_set_username
+    targetted: false
+    preExecute: true
+    scriptName: verbs/set_username
+    
+...

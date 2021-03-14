@@ -16,9 +16,10 @@ function Triggers.getMapTriggers()
 
     local referenceTrigger = triggers[1] -- Events.getTrigger("$trigger_default_defeat_hq")
 
-    --utils:debugObject(utils, 'utils', 2)
-    --utils:debugObject(print, 'print', 3)
+    --utils.debugObject(utils, 'utils', 2)
+    --utils.debugObject(print, 'print', 3)
 
+    Triggers.addToList(triggers, Triggers.getMatchLoggerStartSessionTrigger(referenceTrigger))
     Triggers.addToList(triggers, Triggers.getMatchLoggerInitTrigger(referenceTrigger))
     Triggers.addToList(triggers, Triggers.getStateTrigger(referenceTrigger))
     Triggers.addToList(triggers, Triggers.getVictoryTrigger(referenceTrigger))
@@ -60,6 +61,21 @@ end
 
 -- custom triggers
 
+function Triggers.getMatchLoggerStartSessionTrigger(referenceTrigger)
+    local trigger = {}
+    trigger.id =  "MatchLog Start Session"
+    trigger.recurring = "repeat"
+    trigger.players = referenceTrigger.players
+    trigger.conditions = {}
+    trigger.actions = {}
+    
+    table.insert(trigger.conditions, { id = "player_turn", parameters = { "current" } })
+    table.insert(trigger.conditions, { id = "once_per_session", parameters = {} })
+    table.insert(trigger.actions, { id = "mlog_start_session", parameters = {} })
+    
+    return trigger
+end
+
 function Triggers.getMatchLoggerInitTrigger(referenceTrigger)
     local trigger = {}
     trigger.id =  "MatchLog Init"
@@ -70,8 +86,7 @@ function Triggers.getMatchLoggerInitTrigger(referenceTrigger)
     
     table.insert(trigger.conditions, { id = "player_turn", parameters = { "current" } })
     table.insert(trigger.conditions, { id = "start_of_turn", parameters = {} })
-
-    table.insert(trigger.actions, { id = "mlog_send_init", parameters = {} })
+    table.insert(trigger.actions, { id = "mlog_init_match", parameters = {} })
     
     return trigger
 end
@@ -86,8 +101,7 @@ function Triggers.getStateTrigger(referenceTrigger)
     
     table.insert(trigger.conditions, { id = "player_turn", parameters = { "current" } })
     table.insert(trigger.conditions, { id = "state_change", parameters = {} })
-
-    table.insert(trigger.actions, { id = "mlog_send_state", parameters = { 0 } })
+    table.insert(trigger.actions, { id = "mlog_update_state", parameters = {} })
     
     return trigger
 end
@@ -101,7 +115,7 @@ function Triggers.getVictoryTrigger(referenceTrigger)
     trigger.actions = {}
     
     table.insert(trigger.conditions, { id = "player_victorious", parameters = { "current" } })
-    table.insert(trigger.actions, { id = "mlog_send_players", parameters = {} })
+    table.insert(trigger.actions, { id = "mlog_send_victory", parameters = {} })
     
     return trigger
 end

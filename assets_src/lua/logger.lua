@@ -3,10 +3,13 @@ local State = require "state"
 local json = require "json"
 local utils = require "utils"
 
-local Logger = {}
+local settings = require "settings"
+local SetUsername = require "verbs/set_username"
 
-local matchIdUnitPos = { x=-85, y=-64 }
-local matchIdUnitKey = "MLOG_MatchId"
+local Logger = { }
+local cachedMatchData = nil
+
+local matchesFolder = "matches"
 
 local URL = "https://wargroove-match-worker.gp27.workers.dev/match_log"
 local MATCH_WEBSITE = "https://wgroove.tk/?match_id="
@@ -30,77 +33,96 @@ function Logger.areAllPlayersLocal()
 
   return true
 end
-
 function Logger.openMatchInBrowser()
-  local matchId = Logger.getMatchId()
-  utils:openUrlInBrowser(MATCH_WEBSITE .. matchId)
+  local matchId = State.getMatchId()
+  utils.openUrlInBrowser(MATCH_WEBSITE .. matchId)
 end
 
-function Logger.setMatchId()
-    local matchId = tostring(math.floor(Wargroove.pseudoRandomFromString("MLOG") * 4294967295))
-
-    Wargroove.spawnUnit( -1, matchIdUnitPos, "soldier", true, "")
-    Wargroove.waitFrame()
-    local stateUnit = Wargroove.getUnitAt(matchIdUnitPos)
-    Wargroove.setUnitState(stateUnit, matchIdUnitKey, matchId)
-    Wargroove.updateUnit(stateUnit)
-
-    print('MLOG_MatchId: ' .. matchId)
-end
-
-function Logger.getMatchId()
-  local stateUnit = Wargroove.getUnitAt(matchIdUnitPos)
-  local matchId = Wargroove.getUnitState(stateUnit, matchIdUnitKey)
-  return matchId
-end
-
-
-function Logger.init()
-  Logger.setMatchId()
-  Logger.sendInit()
-end
-
-function Logger.sendInit()
-  local matchId = Logger.getMatchId()
-  local map = State.getMap()
-  local players = State.getPlayers()
-
-  if Logger.isLocalPlayerTurn() then
-    Wargroove.showMessage("Sending match data...")
-    utils:postJSON(URL, { match_id=matchId, map=map, players=players  })
-  end
-end
-
-function Logger.sendState(stateId, isStartOfTurn)
-  local matchId = Logger.getMatchId()
-  local state = State.getState()
-  state.id = tonumber(stateId)
-  
-  --[[if Logger.isLocalPlayerTurn() ~= isStartOfTurn then
-    utils:postJSON(URL, { match_id=matchId, state=state })
-  end]]
-
+function Logger.shouldSendMatchData(isStartOfTurn)
   local allLocal = Logger.areAllPlayersLocal()
   local currentIsLocal = Logger.isLocalPlayerTurn()
 
-  if (
-    allLocal
-    or (
-      currentIsLocal ~= isStartOfTurn
-    )
-  ) then
-    Wargroove.showMessage("Sending match data...")
-    utils:postJSON(URL, { match_id=matchId, state=state })
+  return allLocal or (currentIsLocal ~= isStartOfTurn)
+end
+
+function Logger.setupSession()
+  State.setCurrent()
+  utils.sendVbsCommand("cmd /C if not exist " .. matchesFolder .. " mkdir " .. matchesFolder)
+
+  if settings.save_in_cloud and settings.open_browser then
+    Logger.openMatchInBrowser()
   end
 end
 
-function Logger.sendPlayers()
-  local matchId = Logger.getMatchId()
+function Logger.startSession()
+  local matchId = State.getMatchId()
+
+  if matchId then -- match already setup (player reopened an async match)
+    Logger.setupSession()
+  end
+end
+
+function Logger.initMatch()
+  State.setMatchId()
+  Logger.setupSession()
+end
+
+function Logger.updateState()
+  --[[if SetUsername:shouldSend() then
+    SetUsername:send()
+  end]]
+
+  local delta, state = State.generateDelta()
+  
+  if delta ~= nil then
+    State.pushDelta(delta)
+    State.setCurrent(state)
+    Logger.updateMatchData()
+    return true
+  end
+
+  return false
+end
+
+function Logger.updateMatchData()
+  local matchId = State.getMatchId()
+  local deltas = State.getDeltas()
+  local state = State.getState()
+  local map = State.getMap()
   local players = State.getPlayers()
+
+  cachedMatchData = { match_id=matchId, state=state, map=map, players=players, deltas=deltas }
+end
+
+function Logger.getMatchData()
+  if cachedMatchData == nil then 
+    Logger.updateMatchData()
+  end
+  return cachedMatchData
+end
+
+function Logger.saveMatchData()
+  local matchData = Logger.getMatchData()
+  local matchJson = json.stringify(matchData)
+
+  utils.writeFile(matchesFolder .. "\\" .. matchData.match_id .. '.json', matchJson)
+end
+
+function Logger.sendMatchData()
+  if not settings.save_in_cloud then return end
+
+  local matchData = Logger.getMatchData()
+
+  Wargroove.showMessage("Sending match data...")
+  utils.postJSON(URL, matchData)
+end
+
+function Logger.sendPlayers()
+  local matchData = Logger.getMatchData()
 
   if Logger.isLocalPlayerTurn() then
     Wargroove.showMessage("Sending match data...")
-    utils:postJSON(URL, { match_id=matchId, players=players })
+    utils.postJSON(URL, matchData)
   end
 end
 
