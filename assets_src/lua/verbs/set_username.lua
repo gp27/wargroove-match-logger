@@ -6,7 +6,9 @@ local json = require "json"
 
 local SetUsername = SendData:new()
 
-SetUsername.id = "set_username"
+function SetUsername:canExecute(unit, endPos, targetPos, strParam)
+  return SetUsername:shouldSend()
+end
 
 function SetUsername:shouldSend()
   local username = settings.username
@@ -15,11 +17,11 @@ function SetUsername:shouldSend()
   for id = 0, Wargroove.getNumPlayers(false) - 1 do
     if Wargroove.isLocalPlayer(id) then
       username = State.getUsername(id)
-      if not username then return false end
+      if not username then return true end
     end
   end
 
-  return true
+  return false
 end
 
 function SetUsername:getData()

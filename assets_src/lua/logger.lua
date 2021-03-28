@@ -11,7 +11,8 @@ local cachedMatchData = nil
 
 local matchesFolder = "matches"
 
-local URL = "https://wargroove-match-worker.gp27.workers.dev/match_log"
+local URL = "https://firebasestorage.googleapis.com/v0/b/wargroove-match-storage.appspot.com/o/matches%2F"
+--local URL = "https://wargroove-match-worker.gp27.workers.dev/match_log"
 local MATCH_WEBSITE = "https://wgroove.tk/?match_id="
 
 function Logger.isLocalPlayerTurn()
@@ -47,9 +48,10 @@ end
 
 function Logger.setupSession()
   State.setCurrent()
-  utils.sendVbsCommand("cmd /C if not exist " .. matchesFolder .. " mkdir " .. matchesFolder)
+  utils.sendCommand("cmd /C if not exist " .. matchesFolder .. " mkdir " .. matchesFolder)
 
-  if settings.save_in_cloud and settings.open_browser then
+  if settings.save_online and settings.open_browser then
+    Logger.sendMatchData()
     Logger.openMatchInBrowser()
   end
 end
@@ -68,10 +70,6 @@ function Logger.initMatch()
 end
 
 function Logger.updateState()
-  --[[if SetUsername:shouldSend() then
-    SetUsername:send()
-  end]]
-
   local delta, state = State.generateDelta()
   
   if delta ~= nil then
@@ -109,21 +107,25 @@ function Logger.saveMatchData()
 end
 
 function Logger.sendMatchData()
-  if not settings.save_in_cloud then return end
+  if not settings.save_online then return end
 
   local matchData = Logger.getMatchData()
 
-  Wargroove.showMessage("Sending match data...")
-  utils.postJSON(URL, matchData)
+  Logger.postMatchData(matchData)
 end
 
 function Logger.sendPlayers()
   local matchData = Logger.getMatchData()
 
   if Logger.isLocalPlayerTurn() then
-    Wargroove.showMessage("Sending match data...")
-    utils.postJSON(URL, matchData)
+    Logger.postMatchData(matchData)
   end
+end
+
+function Logger.postMatchData(matchData)
+  local url = URL .. matchData.match_id .. '.json'
+  --Wargroove.showMessage("Sending match data...")
+  utils.postJSON(url, matchData)
 end
 
 return Logger

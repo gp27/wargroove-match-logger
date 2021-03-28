@@ -56,6 +56,7 @@ function State.getMap()
     ocean=      "o",
     beach=      "e",
     cobblestone="f",
+    carpet=     "f",
     plains=     "p",
     road=       "r",
     sea=        "s"
@@ -84,15 +85,19 @@ function State.getState()
     newState.gold[id] = Wargroove.getMoney(id)
   end
 
+  local unitClasses = {}
   local saveUnits = {}
   for _, unit in ipairs(Wargroove.getUnitsAtLocation()) do
     if unit.pos.x ~= matchStateUnitPos.x or unit.pos.y ~= matchStateUnitPos.y then
       local unitCopy = utils.copyTable(unit)
-      saveUnits[unit.id] = unitCopy
+      unitClasses[unitCopy.unitClassId] = unitCopy.unitClass
+      unitCopy.unitClass = nil
+      saveUnits[unitCopy.id + 1] = unitCopy
     end
   end
   
   newState.units = saveUnits
+  newState.unitClasses = unitClasses
   newState.playerId = Wargroove.getCurrentPlayerId()
   newState.turnNumber = Wargroove.getTurnNumber()
 

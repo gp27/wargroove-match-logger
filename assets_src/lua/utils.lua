@@ -5,20 +5,26 @@ local io = require "io"
 local debug = require "debug"
 
 --local silentCmdFilename = "silent-cmd.vbs"
-local tempFileName = "send-data.json"
+local tempFileName = "wgml-send-data.json"
 
 local function escapeCommand(cmd)
     return string.gsub(cmd, '"', '""')
 end
 
-local vbsFilename = "wg-commands.vbs"
+function utils.sendCommand(cmd)
+    local proc = io.popen(cmd, 'r')
+    if proc then
+        proc:close()
+    end
+end
+
+local vbsFilename = "wgml-commands.vbs"
 local filenamePlaceholder = "TMPFILE"
 
 local vbsPipe = nil
 --local vbsFin = 'in.tmp'
 --local vbsIn = nil
-local vbsFout = 'vbs-out.txt'
-local vbsFerr = "vbs-err.txt"
+local vbsFout = 'wgml-vbs-log.txt'
 
 local function prepareVbs()
     local script = [[
@@ -32,7 +38,7 @@ Loop]]
 
     if vbsPipe == nil then
         utils.writeFile(vbsFilename, script)
-        vbsPipe = io.popen('cscript ' .. vbsFilename .. ' > ' .. vbsFout .. ' 2> ' .. vbsFerr, 'w')
+        vbsPipe = io.popen('cscript ' .. vbsFilename .. ' > ' .. vbsFout .. ' 2>&1', 'w')
     end
 
     return vbsPipe

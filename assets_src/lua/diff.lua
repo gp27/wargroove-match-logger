@@ -18,6 +18,10 @@ end
 local function table_diff (A, B)
 	local diff = {}
 
+    if (#A == 0 and #B > 0) or (#A > 0 and #B == 0) then
+        return {A, B}
+    end
+
 	for k,a in pairs(A) do
         local b = B[k]
 
@@ -28,7 +32,6 @@ local function table_diff (A, B)
 		elseif b == nil then
             diff[k] = {a, 0, 0}
 		elseif b ~= a then
-			diff[k] = {}
             diff[k] = {a, b}
 		end
 	end

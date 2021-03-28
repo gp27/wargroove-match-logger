@@ -1,8 +1,8 @@
 ---
 
 id: wagroove-match-logger
-name: "Wargroove Match Logger"              
+name: "Wargroove Match Logger 1.0"
 author: "gp27"
-description: "A mod that save matches info in the cloud" 
+description: "A mod that saves matches as files locally or online. They can later be viewed / analyzed on wgroove.tk"
 
 ...

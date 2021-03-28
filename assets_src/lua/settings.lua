@@ -2,12 +2,12 @@ local io = require "io"
 local json = require "json"
 local settings = {
     username=nil,
-    save_in_cloud=false,
+    save_online=false,
     open_browser=true
     
 }
 
-local settingsFilename = "mlog-settings.txt"
+local settingsFilename = "wgml-settings.txt"
 
 local function formatValue(value)
     if value == nil then return nil end

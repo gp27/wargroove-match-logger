@@ -30,7 +30,7 @@ function SendData:onPostUpdateUnit(unit, targetPos, strParam, path)
 end
 
 
-function SendData:send()
+--[[function SendData:send()
   if not self.id then return end
 
   --SendData.isSending = true
@@ -45,13 +45,9 @@ function SendData:send()
     end
   end
 
-  --stateUnit.playerId = Wargroove.getCurrentPlayerId()
-  --Wargroove.updateUnit(stateUnit)
-  --print(json.stringify(stateUnit))
-
-  if #selectableUnits > 0 then
-    Wargroove.forceAction(selectableUnits, {}, {}, self.id, true, "neutral", "mercival", "")
-  end
-end
+  --if #selectableUnits > 0 then
+  --  Wargroove.forceAction(selectableUnits, {}, {}, self.id, true, "neutral", "mercival", "")
+  --end
+end]]
 
 return SendData
