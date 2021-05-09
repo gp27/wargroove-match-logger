@@ -15,6 +15,15 @@ local function is_array(obj)
   if i == 1 then return false else return true end
 end
 
+local function shift_array(obj)
+    for i = 1, #obj do
+        if obj[i] ~= nil then
+            obj[i - 1] = obj[i]
+            obj[i] = nil
+        end
+    end
+end
+
 local function table_diff (A, B)
 	local diff = {}
 
@@ -53,6 +62,7 @@ local function table_diff (A, B)
 		diff = nil
     else
         if(is_array(diff)) then
+            shift_array(diff)
             diff._t = 'a'
         end
 	end

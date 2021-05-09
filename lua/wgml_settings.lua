@@ -1,10 +1,8 @@
 local io = require "io"
-local json = require "json"
+
 local settings = {
-    username=nil,
-    save_online=false,
-    open_browser=true
-    
+    debug=false,
+    no_prompts=nil
 }
 
 local settingsFilename = "wgml-settings.txt"
@@ -44,6 +42,10 @@ local function readSettings()
 end
 
 readSettings()
-print('settings', json.stringify(settings))
+debugMessage("Settings", settings)
+
+if settings.debug then
+    DEBUG = true
+end
 
 return settings

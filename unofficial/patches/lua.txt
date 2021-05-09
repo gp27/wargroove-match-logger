@@ -1,0 +1,12 @@
+patches:gameplay.dat_unpacked\section_0\lua\wargroove\events.lua
+-- Inject initializer
+
+local _wgml_original_populateTriggerList = Events.populateTriggerList
+
+function Events._wgml_populateTriggerList()
+    local WgmlInit = require "wgml_init"
+    WgmlInit.unofficialInit()
+    return _wgml_original_populateTriggerList()
+end
+
+Events.populateTriggerList = Events._wgml_populateTriggerList
