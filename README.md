@@ -9,11 +9,12 @@ The mod is packed in 2 different types:
 
 ||Official|Unofficial|
 |-|-|-|
-|Easy to install|O|X
-|Register local and<br>online matches|O|O
-|Can be used as spectator|X|O
-|Does not require both players<br>to have it installed|X|O
-|Automatically enabled<br>for all matches*|X|O
+|Easy to install|Yes|No
+|Register local and<br>online matches|Yes|Yes
+|Can be used as spectator|No|Yes
+|Works even if just one person<br>has it installed|No|Yes
+|Automatically enabled<br>for all matches*|No|Yes
+
 (* you can still choose not to record the match when the game starts)
 
 
