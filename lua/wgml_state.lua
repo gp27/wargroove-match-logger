@@ -105,8 +105,12 @@ function State.setDeltas(deltas)
     State.setJsonMetadata(metadataKeys.deltas, deltas)
 end
 
+function State.getFog(fog)
+    return State.getJsonMetadata(metadataKeys.has_fog)
+end
+
 function State.setFog(fog)
-    State.setMetadata(metadataKeys.has_fog, fog and 1 or 0)
+    State.setJsonMetadata(metadataKeys.has_fog, fog and 1 or 0)
 end
 
 --[[function State.getUserId()

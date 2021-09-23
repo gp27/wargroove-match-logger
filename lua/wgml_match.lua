@@ -1,6 +1,5 @@
 local Wargroove = require "wargroove/wargroove"
 local utils = require "wgml_lib_utils"
-local crc32 = require "wgml_lib_crc32"
 local diff = require "wgml_lib_diff"
 local State = require "wgml_state"
 
@@ -10,8 +9,7 @@ local match_id = nil
 local currentState = nil
 local deltas = nil
 local cachedMatchData = nil
-
-local isFog = false
+local is_fog = nil
 
 
 -- Match utils functions
@@ -53,50 +51,20 @@ local function pushDelta(delta)
   State.setDeltas(deltas)
 end
 
-local function genFogBlocks(match_id, players)
-  local isFog = false
-  local vics = ""
-
-  for i, player in ipairs(players) do
-    vics = vics .. (player.is_victorious and "1" or "0")
-  end
-
-  local block = crc32(match_id .. vics)
-  local line = ""
-  local fog_blocks = { block }
-
-  local i = 0
+local function checkIsFog()
   local size =  Wargroove.getMapSize()
   for y=0, size.y - 1 do
     for x=0, size.x - 1 do
-      local tileVisible = Wargroove.canPlayerSeeTile(i % #players, { x=x, y=y })
-      if not tileVisible then
-        isFog = true
+      for id=0, Wargroove.getNumPlayers(false) - 1 do
+        local tileVisible = Wargroove.canPlayerSeeTile(id, { x=x, y=y })
+        if not tileVisible then
+          return true
+        end
       end
-
-      line = line .. (tileVisible and "1" or "0")
-
-      if i == (block % 32) then
-        line = line .. Wargroove.getTerrainNameAt({ x=x, y=y })
-      end
-
-      i = i + 1
-      if i >= 32 then
-        print("" .. block .. line .. match_id .. vics .. (isFog and "1" or "0"))
-
-        block  = crc32("" .. block .. line .. match_id .. vics .. (isFog and "1" or "0"))
-        table.insert(fog_blocks, block)
-        line = ""
-        i = 0
-      end
-
     end
   end
 
-  block  = crc32("" .. block .. line .. match_id .. vics .. (isFog and "1" or "0"))
-  table.insert(fog_blocks, block)
-
-  return fog_blocks, isFog
+ return false
 end
 
 local function updateMatchData()
@@ -105,9 +73,9 @@ local function updateMatchData()
     local state = Match.getState()
     local map = Match.getMap()
     local players = Match.getPlayers()
-    local fog_blocks, is_fog = genFogBlocks(match_id, players)
+    local is_fog = Match.getFog()
 
-    cachedMatchData = { match_id=match_id, state=state, map=map, players=players, deltas=deltas, fog_blocks=fog_blocks, is_fog=is_fog }
+    cachedMatchData = { match_id=match_id, state=state, map=map, players=players, deltas=deltas, is_fog=is_fog }
 end
 
 
@@ -119,6 +87,16 @@ function Match.getID()
     end
 
     return match_id
+end
+
+function Match.getFog()
+  if is_fog ~= nil then return is_fog end
+  is_fog = State.getFog()
+  if is_fog == nil then
+    is_fog = checkIsFog()
+  end
+  State.setFog(is_fog)
+  return is_fog
 end
 
 function Match.getDeltas()
