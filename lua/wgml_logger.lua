@@ -44,11 +44,13 @@ function Logger.setupSession()
     utils.mkdirp(matchesFolder)
     Match.setup()
 
-    Logger.saveMatchData()
+    if Logger.shouldSaveMatchData() then
+       Logger.saveMatchData()
 
-    if options.save_online then
-        Logger.sendMatchData()
-        Logger.openMatchInBrowser()
+        if options.save_online then
+            Logger.sendMatchData()
+            Logger.openMatchInBrowser()
+        end 
     end
 end
 
@@ -72,17 +74,20 @@ function Logger.updateMatch(flags)
     local shouldForceUpdate = flags.isVictory or false
     local updated = Match.update(shouldForceUpdate)
 
-    Logger.saveMatchData()
+    if Logger.shouldSaveMatchData(flags) then
+        Logger.saveMatchData()
 
-    if updated and Logger.options.save_online then
-        if Logger.shouldSendMatchData(flags) then
-           Logger.sendMatchData()
+        if updated and Logger.options.save_online then
+            if Logger.shouldSendMatchData(flags) then
+               Logger.sendMatchData()
+               Logger.openMatchInBrowser()
+            end
         end
     end
 end
 
 
--- utils funnctions
+-- utils functions
 
 function Logger.getMatchInfo()
     local n = Wargroove.getNumPlayers(false)
@@ -104,10 +109,24 @@ function Logger.getMatchInfo()
         end
     end
 
+    local isFogMode = false
+
+    local mapSize = Wargroove.getMapSize()
+
+    for y=0, mapSize.y - 1 do
+      for x=0, mapSize.x - 1 do
+        if not Wargroove.canPlayerSeeTile(0, { x=x, y=y }) then
+          isFogMode = true
+        end
+      end
+    end
+
+
     return {
         isLocal = isLocal,
         isSpectator = isSpectator,
-        isSinglePlayer = isSinglePlayer
+        isSinglePlayer = isSinglePlayer,
+        isFogMode = isFogMode
     }
 end
 
@@ -173,6 +192,13 @@ function Logger.isLocalPlayerTurn()
   return false
 end
 
+function Logger.shouldSaveMatchData(flags)
+    flags = flags or {}
+    if flags.isVictory then return true end
+
+    local match = Match.getMatchData()
+    return not match.is_fog
+end
 
 function Logger.shouldSendMatchData(flags)
     flags = flags or {}
@@ -206,7 +232,12 @@ function Logger.sendMatchData()
     utils.postJSON(UPLOAD_URL, matchData)
 end
 
+local browserOpened = false
+
 function Logger.openMatchInBrowser()
+  if browserOpened then return end
+  browserOpened = true
+
   local match_id = Match.getID()
   utils.openUrlInBrowser(MATCH_WEBSITE .. match_id)
 end
