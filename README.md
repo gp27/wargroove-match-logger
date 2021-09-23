@@ -1,4 +1,4 @@
-# Wargroove Match Logger 1.3
+# Wargroove Match Logger 1.4
 
 A mod for Wargroove.
 It saves matches as files locally or online. They can later be opened with the [Wargroove Match Viewer](https://wgroove.tk) to be replayed, analyzed etc.
@@ -51,6 +51,9 @@ If you choose to `Share the match online` a command line window will open when y
 
 If a match is shared online you can just refresh the browser tab in the match viewer to see the latest moves. You can also share the link with anyone and it will work for them as well.
 The shared version is goint to be updatetd at every move, if you are registering the match as one of the playing players, or at the start of every turn if you are registering as a spectator.
+
+### Fog of war
+Fog of war matches can be registered, but both the local `.json` file and the and the online saved match will appear only after the match has ended, to prevent cheating.
 
 ## Requirements
 - cURL - It should be preinstalled on Windows 10 (build >= 17063). Alternatively you can download it ([cURL](https://curl.se/windows/)) and place it in `C:\Windows\System32\`

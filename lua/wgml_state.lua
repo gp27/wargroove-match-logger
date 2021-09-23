@@ -7,7 +7,8 @@ local metadataPrefix = "wgml_"
 local metadataKeys = {
     user_options = metadataPrefix .. "user_options",
     match_id = metadataPrefix .. "match_id",
-    deltas = metadataPrefix .. "deltas"
+    deltas = metadataPrefix .. "deltas",
+    has_fog = metadataPrefix .. "has_fog"
 }
 
 local function genUniqueId(str)
@@ -35,11 +36,14 @@ function State.getMetadataUnit()
 end
 
 function State.clearMetaDataFromUnit(unit)
+    local newState = {}
+
     for i, stateKey in ipairs(unit.state) do
-        if (string.sub(stateKey.key, 1, string.len(metadataPrefix)) == metadataPrefix) then
-            table.remove(unit.state, i)
+        if (string.sub(stateKey.key, 1, string.len(metadataPrefix)) ~= metadataPrefix) then
+            table.insert(newState, stateKey)
         end
     end
+    unit.state = newState
 end
 
 function State.getMetadata(key)
@@ -99,6 +103,14 @@ end
 
 function State.setDeltas(deltas) 
     State.setJsonMetadata(metadataKeys.deltas, deltas)
+end
+
+function State.getFog(fog)
+    return State.getJsonMetadata(metadataKeys.has_fog)
+end
+
+function State.setFog(fog)
+    State.setJsonMetadata(metadataKeys.has_fog, fog and 1 or 0)
 end
 
 --[[function State.getUserId()

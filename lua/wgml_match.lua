@@ -9,6 +9,7 @@ local match_id = nil
 local currentState = nil
 local deltas = nil
 local cachedMatchData = nil
+local is_fog = nil
 
 
 -- Match utils functions
@@ -50,14 +51,31 @@ local function pushDelta(delta)
   State.setDeltas(deltas)
 end
 
+local function checkIsFog()
+  local size =  Wargroove.getMapSize()
+  for y=0, size.y - 1 do
+    for x=0, size.x - 1 do
+      for id=0, Wargroove.getNumPlayers(false) - 1 do
+        local tileVisible = Wargroove.canPlayerSeeTile(id, { x=x, y=y })
+        if not tileVisible then
+          return true
+        end
+      end
+    end
+  end
+
+ return false
+end
+
 local function updateMatchData()
     local match_id = Match.getID()
     local deltas = Match.getDeltas()
     local state = Match.getState()
     local map = Match.getMap()
     local players = Match.getPlayers()
+    local is_fog = Match.getFog()
 
-    cachedMatchData = { match_id=match_id, state=state, map=map, players=players, deltas=deltas }
+    cachedMatchData = { match_id=match_id, state=state, map=map, players=players, deltas=deltas, is_fog=is_fog }
 end
 
 
@@ -69,6 +87,16 @@ function Match.getID()
     end
 
     return match_id
+end
+
+function Match.getFog()
+  if is_fog ~= nil then return is_fog end
+  is_fog = State.getFog()
+  if is_fog == nil then
+    is_fog = checkIsFog()
+  end
+  State.setFog(is_fog)
+  return is_fog
 end
 
 function Match.getDeltas()
