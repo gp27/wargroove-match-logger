@@ -13,7 +13,7 @@ The mod is packed in 2 different types:
 |Register local and<br>online matches|Yes|Yes
 |Can be used as spectator|No|Yes
 |Works even if just one person<br>has it installed|No|Yes
-|Automatically enabled<br>for all matches*|No|Yes
+|Automatically enabled<br>for all matches|No|Yes*
 
 (* you can still choose not to record the match when the game starts)
 
