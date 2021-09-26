@@ -15,10 +15,12 @@ function Triggers.getMapTriggers()
 
     local referenceTrigger = triggers[1] -- Events.getTrigger("$trigger_default_defeat_hq")
 
-    Triggers.addToList(triggers, Triggers.getWgmlStartSessionTrigger(referenceTrigger))
-    Triggers.addToList(triggers, Triggers.getWgmlInitTrigger(referenceTrigger))
-    Triggers.addToList(triggers, Triggers.getWgmlStateChangeTrigger(referenceTrigger))
-    Triggers.addToList(triggers, Triggers.getWgmlVictoryTrigger(referenceTrigger))
+    if referenceTrigger then
+       Triggers.addToList(triggers, Triggers.getWgmlStartSessionTrigger(referenceTrigger))
+       Triggers.addToList(triggers, Triggers.getWgmlInitTrigger(referenceTrigger))
+       Triggers.addToList(triggers, Triggers.getWgmlStateChangeTrigger(referenceTrigger))
+       Triggers.addToList(triggers, Triggers.getWgmlVictoryTrigger(referenceTrigger))
+    end
 
     return triggers
 end

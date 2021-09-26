@@ -1,4 +1,4 @@
-# Wargroove Match Logger 1.4
+# Wargroove Match Logger 1.4.1
 
 A mod for Wargroove.
 It saves matches as files locally or online. They can later be opened with the [Wargroove Match Viewer](https://wgroove.tk) to be replayed, analyzed etc.
