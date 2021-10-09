@@ -109,7 +109,7 @@ function Logger.getMatchInfo()
         end
     end
 
-    local isFogMode = false
+    --[[local isFogMode = false
 
     local mapSize = Wargroove.getMapSize()
 
@@ -119,14 +119,14 @@ function Logger.getMatchInfo()
           isFogMode = true
         end
       end
-    end
+    end]]
 
 
     return {
         isLocal = isLocal,
         isSpectator = isSpectator,
         isSinglePlayer = isSinglePlayer,
-        isFogMode = isFogMode
+        --isFogMode = isFogMode
     }
 end
 
@@ -197,6 +197,7 @@ function Logger.shouldSaveMatchData(flags)
     if flags.isVictory then return true end
 
     local match = Match.getMatchData()
+    debugMessage('match.is_fog', match.is_fog)
     return not match.is_fog
 end
 
@@ -221,6 +222,7 @@ function Logger.shouldSendMatchData(flags)
 end
 
 function Logger.saveMatchData()
+    debugMessage('Logger.saveMatchData')
     local matchData = Match.getMatchData()
     utils.writeJson(matchesFolder .. "\\" .. matchData.match_id .. '.json', matchData)
 end

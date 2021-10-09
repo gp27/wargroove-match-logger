@@ -8,6 +8,7 @@ local metadataKeys = {
     user_options = metadataPrefix .. "user_options",
     match_id = metadataPrefix .. "match_id",
     deltas = metadataPrefix .. "deltas",
+    is_fog = metadataPrefix .. "is_fog",
     has_fog = metadataPrefix .. "has_fog"
 }
 
@@ -106,11 +107,11 @@ function State.setDeltas(deltas)
 end
 
 function State.getFog(fog)
-    return State.getJsonMetadata(metadataKeys.has_fog)
+    return State.getJsonMetadata(metadataKeys.is_fog)
 end
 
 function State.setFog(fog)
-    State.setJsonMetadata(metadataKeys.has_fog, fog and 1 or 0)
+    State.setJsonMetadata(metadataKeys.is_fog, fog)
 end
 
 --[[function State.getUserId()
