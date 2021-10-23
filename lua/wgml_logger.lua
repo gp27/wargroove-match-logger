@@ -8,6 +8,7 @@ local settings = require "wgml_settings"
 local matchesFolder = "matches"
 local UPLOAD_URL = "https://worker.wgroove.tk/match_log"
 local MATCH_WEBSITE = "https://wgroove.tk/?match_id="
+local LIVE_STATS_FILENAME = 'wgml-live-stats.html'
 
 local Logger = {
     unofficial = false,
@@ -44,6 +45,10 @@ function Logger.setupSession()
     utils.mkdirp(matchesFolder)
     Match.setup()
 
+    if settings.live_stats then
+        Logger.updateStats()
+    end
+
     if Logger.shouldSaveMatchData() then
        Logger.saveMatchData()
 
@@ -73,6 +78,14 @@ function Logger.updateMatch(flags)
 
     local shouldForceUpdate = flags.isVictory or false
     local updated = Match.update(shouldForceUpdate)
+
+    if settings.live_stats then
+        if flags.isVictory then
+            Logger.removeStats()
+        else
+            Logger.updateStats()
+        end
+    end
 
     if Logger.shouldSaveMatchData(flags) then
         Logger.saveMatchData()
@@ -225,6 +238,31 @@ function Logger.saveMatchData()
     debugMessage('Logger.saveMatchData')
     local matchData = Match.getMatchData()
     utils.writeJson(matchesFolder .. "\\" .. matchData.match_id .. '.json', matchData)
+end
+
+function Logger.updateStats()
+    debugMessage('Logger.updateStats')
+    local stats = Match.getStats()
+
+    local stats_text = '<script>setTimeout(function(){location.reload(true)},2000)</script><style>table{font-family:monospace}th{background:#d0bdac;border:4px groove #f8f9e7;padding:3px 5px;border-radius:8px 8px 0 0;color:#3a4269;text-shadow:1px 1px 0 #fefff1,-1px -1px 0 #fefff1,-1px 1px 0 #fefff1,1px -1px 0 #fefff1}td{background:#f6f8eb;border:4px solid #cbcbcb;border-style:groove;border-radius:3px;padding:3px 5px;text-align:right;color:#3c3e55}td:first-child{font-weight:700;text-transform:capitalize;text-align:left}</style><table><thead><tr><th style="opacity:0"></th><th>Gold</th><th>Income</th><th>Army</th><th>Units</th><th>Combat U.</th></tr></thead><tbody>'
+
+    for playerId, stat in ipairs(stats) do
+        stats_text = stats_text ..
+          '<tr><td>' .. stat.name .. '</td><td>' ..
+          stat.gold .. '</td><td>' .. 
+          stat.income .. '</td><td>' .. 
+          stat.army_value .. '</td><td>' .. 
+          stat.unit_count .. '</td><td>' .. 
+          stat.c_unit_count .. '</td></tr>'
+    end
+
+    stats_text = stats_text .. '</tbody></table>'
+
+    utils.writeFile(LIVE_STATS_FILENAME, stats_text)
+end
+
+function Logger.removeStats()
+    utils.writeFile(LIVE_STATS_FILENAME, '<script>setTimeout(function(){location.reload(true)},2000)</script>')
 end
 
 function Logger.sendMatchData()

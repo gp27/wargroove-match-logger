@@ -1,4 +1,4 @@
-# Wargroove Match Logger 1.4.2
+# Wargroove Match Logger 1.5.0
 
 A mod for Wargroove.
 It saves matches as files locally or online. They can later be opened with the [Wargroove Match Viewer](https://wgroove.tk) to be replayed, analyzed etc.
@@ -38,7 +38,9 @@ To register a match:
 - if you are using the offical mod, you just need to enable it when you create the local/online match
 - if you are using the unoffical mod, you will get a prompt asking if you want to register, when you start a match.
 
-If you are playing online, you will also get a prompt to `Share the match online`. If you enable it, your browser will open and you acn share the link in the address bar with anyone who wants to see the "live" replay
+<img src="img/register_prompt.png" width="700"/>
+
+If you are playing online, you will also get a prompt to `Share the match online`. If you enable it, your browser will open and you can share the link in the address bar with anyone who wants to see the "live" replay
 
 When a match is registered, a file `.json` with a unique name will be created in the `matches` folder, under the Wargroove install directory:
 
@@ -48,13 +50,35 @@ The file is updated every time a player makes a move.
 
 You can drag and drop the file on https://wgroove.tk to view the match.
 
+<img src="img/match_viewer.png" width="700"/>
+
 If you choose to `Share the match online` a command line window will open when you start the match. You can minimize this window, but if you close it the online match will stop being updated (the local copy will still be saved correctly).
 
 If a match is shared online you can just refresh the browser tab in the match viewer to see the latest moves. You can also share the link with anyone and it will work for them as well.
 The shared version is goint to be updatetd at every move, if you are registering the match as one of the playing players, or at the start of every turn if you are registering as a spectator.
 
-### Fog of war
+## Settings
+You can configure some mod settings by ceating the file
+
+`C:\Program Files (x86)\Steam\steamapps\common\Wargroove\wgml-settings.txt`
+```
+live_stats = true
+no_prompts = false
+debug = false
+```
+
+## Fog of war
 Fog of war matches can be registered, but both the local `.json` file and the and the online saved match will appear only after the match has ended, to prevent cheating.
+
+## Live Stats for Streamers
+If you enable live stats in the mod settings, the following file will become be created and updated while registering matches:
+
+`C:\Program Files (x86)\Steam\steamapps\common\Wargroove\wgml-live-stats.html`
+
+You can then add the file as a streaming source in software like OBS.
+
+<img src="img/live_stats.png" width="700"/>
+
 
 ## Requirements
 - cURL - It should be preinstalled on Windows 10 (build >= 17063). Alternatively you can download it ([cURL](https://curl.se/windows/)) and place it in `C:\Windows\System32\`

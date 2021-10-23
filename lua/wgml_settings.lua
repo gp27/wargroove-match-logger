@@ -2,7 +2,8 @@ local io = require "io"
 
 local settings = {
     debug=false,
-    no_prompts=nil
+    no_prompts=nil,
+    live_stats=false
 }
 
 local settingsFilename = "wgml-settings.txt"
