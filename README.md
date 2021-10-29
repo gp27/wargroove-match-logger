@@ -1,4 +1,4 @@
-# Wargroove Match Logger 1.5.0
+# Wargroove Match Logger 1.6.0
 
 A mod for Wargroove.
 It saves matches as files locally or online. They can later be opened with the [Wargroove Match Viewer](https://wgroove.tk) to be replayed, analyzed etc.
@@ -71,13 +71,39 @@ debug = false
 Fog of war matches can be registered, but both the local `.json` file and the and the online saved match will appear only after the match has ended, to prevent cheating.
 
 ## Live Stats for Streamers
-If you enable live stats in the mod settings, the following file will become be created and updated while registering matches:
+If you enable live stats in the mod settings, the following file will be created and updated while registering matches:
 
 `C:\Program Files (x86)\Steam\steamapps\common\Wargroove\wgml-live-stats.html`
 
 You can then add the file as a streaming source in software like OBS.
 
 <img src="img/live_stats.png" width="700"/>
+
+The URL that you need to insert in OBS should be formatted like this:
+
+`file:///C:\Program Files (x86)\Steam\steamapps\common\Wargroove\wgml-live-stats.html?show=`
+
+You can append some comma separated values to `?show=` to choose what kind of data you want to show. The available options are:
+
+- `current_stats`
+- `chart_income`
+- `chart_army`
+- `chart_unit_count`
+- `chart_combat_uc` (Combat Unit Count)
+
+It is possible to modify all chart values in the following way:
+
+- `chart_income:avg` (shows the Turn Average chart; default )
+- `chart_income:turn` (show the End of Turn chart)
+- `chart_income:mov` (show the All Moves chart)
+
+#### Example
+The link to show the current stats table and the ArmyValue Turn Average chart:
+
+`file:///C:\Program Files (x86)\Steam\steamapps\common\Wargroove\wgml-live-stats.html?show=current_stats,chart_army:avg`
+
+#### Warning
+`wgml-live-stats.html` won't show anyting regardless of how you set the link unless a match is currently being recorded
 
 
 ## Requirements

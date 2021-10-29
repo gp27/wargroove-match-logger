@@ -40,46 +40,6 @@ local function generateState()
   return state
 end
 
-local function generateStats(state)
-  if not state then return nil end
-  local stats = {}
-  for i = 1, Wargroove.getNumPlayers(false) do
-    local id = i - 1
-    stats[i] = {
-      name = 'P'..id,
-      gold = state.gold['p_'..id],
-      income = 0,
-      unit_count = 0,
-      c_unit_count = 0,
-      army_value = 0
-    }
-  end
-  for _, unit in pairs(state.units) do
-    local i = tonumber(unit.playerId) + 1
-    local stat = stats[i]
-    if stat then
-      local cid = unit.unitClassId
-
-      if cid:sub(1,10) == 'commander_' then
-        stat.name = 'P'..i..' - '.. cid:sub(11)
-      end
-
-      stat.unit_count = stat.unit_count + 1 
-      if unit.garrisonClassId == 'garrison' then
-        if cid == 'city' or cid == 'hq' or cid == 'water_city' then
-          stat.income = stat.income + 100
-        end
-      else
-        stat.c_unit_count = stat.c_unit_count + 1
-        local value = state.unitClasses[cid].cost * unit.health / 100
-        stat.army_value = stat.army_value + value
-      end
-    end
-  end
-  debugMessage(stats)
-  return stats
-end
-
 local function generateDelta()
   if currentState == nil then return nil end
   local newState = generateState()
@@ -197,10 +157,6 @@ end
 
 function Match.getState()
     return currentState
-end
-
-function Match.getStats()
-  return generateStats(currentState)
 end
 
 function Match.getMatchData()
